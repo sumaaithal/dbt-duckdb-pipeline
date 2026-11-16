@@ -50,3 +50,19 @@ models:
         description: "Location of the job postings."
       - name: postings
         description: "Count of job postings for the given location."
+
+  - name: monthly_summary
+    description: "Model that provides a monthly summary of job postings."
+    config:
+      persist_docs:
+        relation: true #both for tables and columns
+        columns: true
+    columns:
+      - name: month
+        description: "Month when the job postings were searched or retrieved."
+      - name: total_postings
+        description: "Total count of job postings for the given month."
+      - name: remote_postings
+        description: "Count of job postings that allow remote work for the given month."
+      - name: pct_remote
+        description: "Percentage of job postings that allow remote work for the given month."
