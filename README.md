@@ -1,24 +1,25 @@
-# dbt-duckdb-pipeline
+# 🧩 dbt-duckdb-pipeline
 
 A dbt + DuckDB analytics pipeline for job market data. The project reads raw parquet files, stages them into clean job-posting models, and produces downstream tables for monthly trends, top locations, and remote-work analysis.
 
-## Overview
+## 📊 Overview
 
 This project answers practical business questions such as:
 
-- How many job postings are created each month?
-- Which roles are growing or declining over time?
-- Which cities or locations have the highest job demand?
-- How much of the job market supports remote work?
+- 📈 How many job postings are created each month?
+- 📉 Which roles are growing or declining over time?
+- 🌍 Which cities or locations have the highest job demand?
+- 🏠 How much of the job market supports remote work?
 
 The pipeline follows a standard analytics engineering model:
-- raw parquet files are defined as dbt sources
-- a staging model cleans and filters the data
-- aggregated models build business-ready metrics
-- tests validate data quality and model integrity
-- a generated DuckDB warehouse can be shared and queried externally
 
-## Project structure
+- 🧱 raw parquet files are defined as dbt sources
+- 🧹 a staging model cleans and filters the data
+- 📊 aggregated models build business-ready metrics
+- ✅ tests validate data quality and model integrity
+- 🗃️ a generated DuckDB warehouse can be shared and queried externally
+
+## 🗂️ Project structure
 
 ```text
 dbt-duckdb-pipeline/
@@ -39,7 +40,7 @@ dbt-duckdb-pipeline/
 └── target/
 ```
 
-## Source data and parquet usage
+## 📦 Source data and parquet usage
 
 The raw source is defined in `analytics/models/sources.yml`:
 
@@ -57,14 +58,16 @@ sources:
 This configuration tells DuckDB to treat all parquet files matching `raw_job_postings_*.parquet` as a dbt source table named `raw.job_postings`.
 
 Why this matters:
-- the raw layer stays lightweight and portable
-- no external database is required for local development
-- parquet files are efficient for analytics workloads
-- the raw data can be versioned and reused easily
 
-## Pipeline logic
+- 📁 the raw layer stays lightweight and portable
+- 🧰 no external database is required for local development
+- ⚡ parquet files are efficient for analytics workloads
+- 🔄 the raw data can be versioned and reused easily
 
-### 1. job_postings
+## 🔄 Pipeline logic
+
+### 1. 🏷️ job_postings
+
 This is the staging model. It reads from the raw source and keeps only the fields needed for downstream analysis.
 
 ```sql
@@ -89,13 +92,15 @@ WHERE error IS NULL
 ```
 
 Key logic:
+
 - selects relevant columns
 - materializes as a view
 - removes invalid records with `WHERE error IS NULL`
 
 This is the first clean layer in the pipeline and ensures downstream models do not inherit broken data.
 
-### 2. jobs_per_month
+### 2. 📅 jobs_per_month
+
 This model groups postings by month and role.
 
 ```sql
@@ -109,6 +114,7 @@ ORDER BY month, role
 ```
 
 Key logic:
+
 - `DATE_TRUNC('month', search_date)` normalizes the date
 - `search_term` acts as the role/category dimension
 - `COUNT(*)` calculates the postings volume
@@ -116,7 +122,8 @@ Key logic:
 
 This creates a trend table for understanding how demand changes over time.
 
-### 3. top_locations
+### 3. 🌍 top_locations
+
 This model ranks the top job locations by posting count.
 
 ```sql
@@ -130,6 +137,7 @@ LIMIT 10
 ```
 
 Key logic:
+
 - groups by `job_location`
 - counts postings per location
 - sorts descending
@@ -137,7 +145,8 @@ Key logic:
 
 This is useful for identifying the highest-volume hiring markets.
 
-### 4. monthly_summary
+### 4. 📈 monthly_summary
+
 This model combines totals and remote-job share.
 
 ```sql
@@ -167,6 +176,7 @@ ORDER BY month
 ```
 
 Key logic:
+
 - totals calculates total postings per month
 - remote counts only jobs where `job_work_from_home` is true
 - the final query combines both sets and calculates remote percentage
@@ -174,7 +184,7 @@ Key logic:
 
 This is the most business-facing metric layer in the pipeline.
 
-## dbt tests and quality checks
+## ✅ dbt tests and quality checks
 
 The project uses dbt tests to validate the quality of the transformed data. These checks are defined in `analytics/models/properties.yml`.
 
@@ -209,13 +219,14 @@ models:
 ```
 
 This ensures:
-- important columns are not missing
-- monthly outputs are unique and stable
-- the data is safe to use in downstream analysis
+
+- ⚠️ important columns are not missing
+- 📅 monthly outputs are unique and stable
+- 🧠 the data is safe to use in downstream analysis
 
 These tests help prevent broken transformations from entering the warehouse unnoticed.
 
-## GitHub Actions and generated warehouse
+## 🚀 GitHub Actions and generated warehouse
 
 This project is structured to support automated warehouse generation and release-based sharing.
 
@@ -226,15 +237,17 @@ https://github.com/sumaaithal/dbt-duckdb-pipeline/releases/download/warehouse/pr
 ```
 
 This enables a workflow where:
-1. GitHub Actions runs the dbt pipeline
-2. the DuckDB warehouse is regenerated
-3. the final `prod.duckdb` file is uploaded to the release
-4. the warehouse can be downloaded and queried live
+
+1. 🤖 GitHub Actions runs the dbt pipeline
+2. 🗃️ the DuckDB warehouse is regenerated
+3. 📤 the final `prod.duckdb` file is uploaded to the release
+4. 🔍 the warehouse can be downloaded and queried live
 
 This is useful for:
-- sharing the latest build with teammates
-- validating outputs outside the local environment
-- querying the final dataset without rerunning dbt locally
+
+- 👥 sharing the latest build with teammates
+- 🧪 validating outputs outside the local environment
+- 📊 querying the final dataset without rerunning dbt locally
 
 Example query against the downloaded warehouse:
 
@@ -252,9 +265,9 @@ ORDER BY month DESC
 LIMIT 10;
 ```
 
-## Setup
+## ⚙️ Setup
 
-### Prerequisites
+### 🧰 Prerequisites
 
 - Python 3.9+
 - pip
@@ -262,7 +275,7 @@ LIMIT 10;
 - dbt Core
 - DuckDB adapter for dbt
 
-### Install
+### 📥 Install
 
 ```bash
 python3 -m venv .venv
@@ -271,14 +284,14 @@ pip install --upgrade pip
 pip install dbt-duckdb
 ```
 
-### Verify the environment
+### 🔎 Verify the environment
 
 ```bash
 dbt --version
 dbt debug
 ```
 
-## Run the project
+## 🏃 Run the project
 
 ```bash
 dbt deps
@@ -287,35 +300,37 @@ dbt test
 dbt build
 ```
 
-## Generate documentation
+## 📚 Generate documentation
 
 ```bash
 dbt docs generate
 dbt docs serve
 ```
 
-## Why this pipeline is useful
+## 💡 Why this pipeline is useful
 
 This project demonstrates a practical dbt workflow for local analytics:
-- raw parquet files become source tables
-- staging models normalize and clean data
-- aggregation models create analytical metrics
-- tests enforce quality checks
-- the final warehouse can be published and queried live
+
+- 🧱 raw parquet files become source tables
+- 🧹 staging models normalize and clean data
+- 📊 aggregation models create analytical metrics
+- ✅ tests enforce quality checks
+- 🗃️ the final warehouse can be published and queried live
 
 It is small enough to understand quickly, but structured enough to reflect a real-world analytics engineering setup.
 
-## Summary
+## 🧾 Summary
 
 This repo is a lightweight analytics pipeline built with dbt and DuckDB. It turns raw job-posting data into meaningful reporting tables by:
-- staging and cleaning source data
-- aggregating by time and role
-- ranking top locations
-- measuring remote-job share
-- validating data through dbt tests
-- publishing the warehouse for external querying
+
+- 🧹 staging and cleaning source data
+- 📅 aggregating by time and role
+- 🌍 ranking top locations
+- 🏠 measuring remote-job share
+- ✅ validating data through dbt tests
+- 🚀 publishing the warehouse for external querying
 
 This makes the project a solid example of a clean, maintainable, and testable dbt pipeline.
 
-Author: 
+### 👩‍💻 Author
 - Suma Aithal (Analytics Engineer)
