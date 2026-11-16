@@ -265,6 +265,20 @@ ORDER BY month DESC
 LIMIT 10;
 ```
 
+## 🌐 Live documentation site
+
+The project documentation is published live here:
+
+https://sumaaithal.github.io/dbt-duckdb-pipeline/
+
+This site is generated from the dbt project metadata and includes:
+- model descriptions
+- column documentation
+- lineage and dependencies
+- source-to-model relationships
+
+It is useful for understanding how the pipeline is structured without needing to open the SQL files directly.
+
 ## ⚙️ Setup
 
 ### 🧰 Prerequisites
